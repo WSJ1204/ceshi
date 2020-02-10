@@ -1,0 +1,57 @@
+import json
+from urllib import parse
+
+import tornado
+from tornado.web import Application, RequestHandler
+from tornado.ioloop import IOLoop
+import platform
+import asyncio
+
+if platform.system() == "Windows":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+class IndexHandler(tornado.web.RequestHandler):
+    def get(self):
+        print(self.request)
+
+        json_str = {
+            "ESBREQ": {
+                "DATA": {
+                    "Supervisor": "%E7%8E%8B%E6%99%93%E9%BE%99",
+                    "FilterStatus": "1",
+                    "Abstract": "+%E5%A7%94%E6%89%98%E6%9C%AA%E5%BE%85%E6%8A%A5%E7%8A%B6%E6%80%81++%5B%E4%B8%A5%E9%87%8D%5D%E5%90%88%E5%90%8C%E7%BC%96%E5%8F%B7%E4%B8%BA%3AG300002797%2C%E8%B5%84%E9%87%91%E8%B4%A6%E5%8F%B7%E4%B8%BA%3A34431789%E7%9A%84%E5%A7%94%E6%89%98%E6%9C%AA%E6%8A%A5%0D%0A%E5%90%88%E5%90%8C%E7%BC%96%E5%8F%B7%E4%B8%BA%3AGC00011348%2C%E8%B5%84%E9%87%91%E8%B4%A6%E5%8F%B7%E4%B8%BA%3A33654016%E7%9A%84%E5%A7%94%E6%89%98%E6%9C%AA%E6%8A%A5%0D%0A+",
+                    "warntime": "2019-12-25+13%3A07%3A23",
+                    "DeviceIP": "10.17.22.22",
+                    "DeviceUsage": "%E6%8E%A5%E5%8F%A3%E5%BA%93%E5%A4%87%E6%9C%BA",
+                    "SSMSystem": "%E8%BF%90%E7%BB%B4%E7%AE%A1%E7%90%86%E5%B9%B3%E5%8F%B0(%E6%AD%A3%E5%BC%8F)",
+                    "AppName": "%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2",
+                    "KCMMSystem": "%E8%8A%82%E7%82%B9%E4%BA%8C",
+                    "PolicyDescription": "%E4%B8%80%E8%88%AC%E4%B8%BA%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6%E5%BB%B6%E8%BF%9F%EF%BC%8C%E7%99%BB%E8%AE%B0%E4%BA%8B%E4%BB%B6%E5%8D%B3%E5%8F%AF%EF%BC%8C%E4%B8%80%E8%88%AC%E5%BD%93%E6%97%B6%E6%A3%80%E6%9F%A5%E5%A7%94%E6%89%98%E5%B7%B2%E6%8A%A5%E3%80%82%E5%AE%9E%E9%99%85%E4%B8%8D%E5%BD%B1%E5%93%8D%E4%B8%9A%E5%8A%A1%E3%80%82",
+                    "IndexNmae": "%E5%80%BC",
+                    "Level": "%E4%B8%A5%E9%87%8D",
+                    "Room": "%E4%B8%9C%E5%9D%9D%E6%9C%BA%E6%88%BF",
+                    "DeviceName": "DBJF-JD2-OIWBK",
+                    "IndexExample": "%E5%A7%94%E6%89%98%E6%9C%AA%E5%BE%85%E6%8A%A5%E7%8A%B6%E6%80%81"
+                },
+                "HEADER": {
+                    "MESSAGE_ID": "MonitorEvent"
+                }
+            }
+        }
+        self.write(parse.unquote(json.dumps(json_str)))
+
+
+if __name__ == "__main__":
+    app = tornado.web.Application([
+        (r"/", IndexHandler),
+    ])
+
+    # 使用tornado专用的非阻塞单线程服务器
+    http_server = tornado.httpserver.HTTPServer(app)
+
+    port = 9000
+    http_server.listen(port)
+    print('server is start on port:{}'.format(port))
+
+    # 启动服务
+    tornado.ioloop.IOLoop.instance().start()
